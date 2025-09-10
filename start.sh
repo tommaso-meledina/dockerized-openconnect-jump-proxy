@@ -49,7 +49,7 @@ sed "s/{{SQUID_PORT}}/${SQUID_PORT}/g" /etc/squid/squid.conf.template > /etc/squ
 if [ -z "$OUTBOUND_PROXY_PAC_URL" ]; then
   log "No OUTBOUND_PROXY_PAC_URL specified, not amending squid configuration"
 else
-  log "OUTBOUND_PROXY_PAC_URL specified, amending squid configuration"
+  log "OUTBOUND_PROXY_PAC_URL specified as $OUTBOUND_PROXY_PAC_URL, amending squid configuration"
   echo "" >> /etc/squid/squid.conf
   echo "cache_peer 127.0.0.1 parent $PX_PORT 0 no-query default" >> /etc/squid/squid.conf
   echo "" >> /etc/squid/squid.conf
@@ -66,6 +66,7 @@ log "squid kicked off"
 if [ -z "$OUTBOUND_PROXY_PAC_URL" ]; then
   log "No OUTBOUND_PROXY_PAC_URL specified, skipping px-proxy startup"
 else
+  log "OUTBOUND_PROXY_PAC_URL specified as $OUTBOUND_PROXY_PAC_URL, will start a px-proxy"
   log "waiting $WAIT_TIME_SECONDS seconds..."
   sleep $WAIT_TIME_SECONDS
   log "...done waiting, starting px-proxy with PAC location $OUTBOUND_PROXY_PAC_URL on port $PX_PORT"
