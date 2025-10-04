@@ -9,7 +9,7 @@ DEFAULT_VPN_USER_AGENT='AnyConnect Windows 4.9.00086'
 
 log() {
   message=$1
-  if [ -n message ];then
+  if [ -n "$message" ];then
     echo "$SCRIPT_NAME - $message"
   fi
 }
@@ -71,6 +71,29 @@ else
   sleep $WAIT_TIME_SECONDS
   log "...done waiting, starting px-proxy with PAC location $OUTBOUND_PROXY_PAC_URL on port $PX_PORT"
   px --pac="$OUTBOUND_PROXY_PAC_URL" --listen"$PX_HOST" --port="$PX_PORT" --debug &
+fi
+
+SOCKS_PORT=${SOCKS_PORT:-1080}
+SOCKS_HOST=${SOCKS_HOST:-0.0.0.0}
+SOCKS_OUTGOING_BIND=${SOCKS_OUTGOING_BIND:-}
+SOCKS_USER=${SOCKS_USER:-}
+SOCKS_PASS=${SOCKS_PASS:-}
+
+SOCKS_BIND_ARGS=""
+if [ -n "$SOCKS_OUTGOING_BIND" ]; then
+  SOCKS_BIND_ARGS="-b $SOCKS_OUTGOING_BIND"
+fi
+
+if command -v microsocks >/dev/null 2>&1; then
+  if [ -n "$SOCKS_USER" ] && [ -n "$SOCKS_PASS" ]; then
+    log "Starting microsocks (Socks5) with auth on $SOCKS_HOST:$SOCKS_PORT (outgoing bind: ${SOCKS_OUTGOING_BIND:-default})"
+    microsocks -i "$SOCKS_HOST" -p "$SOCKS_PORT" $SOCKS_BIND_ARGS -u "$SOCKS_USER" -P "$SOCKS_PASS" &
+  else
+    log "Starting microsocks (Socks5) without auth on $SOCKS_HOST:$SOCKS_PORT (outgoing bind: ${SOCKS_OUTGOING_BIND:-default})"
+    microsocks -i "$SOCKS_HOST" -p "$SOCKS_PORT" $SOCKS_BIND_ARGS &
+  fi
+else
+  log "microsocks binary not found: SOCKS proxy won't start"
 fi
 
 wait -n
