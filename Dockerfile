@@ -1,7 +1,7 @@
 FROM ubuntu:22.04
 
 RUN apt-get update && apt-get install -y \
-    openconnect \
+    openvpn \
     squid \
     iproute2 \
     iputils-ping \

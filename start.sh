@@ -3,9 +3,6 @@
 SCRIPT_NAME=$0
 
 WAIT_TIME_SECONDS=5
-DEFAULT_VPN_AUTH_GROUP="development"
-DEFAULT_VPN_OS="win"
-DEFAULT_VPN_USER_AGENT='AnyConnect Windows 4.9.00086'
 
 log() {
   message=$1
@@ -16,26 +13,13 @@ log() {
 
 set -e
 
-log "Starting openconnect..."
+log "Starting openvpn..."
 
-VPN_AUTH_GROUP=${VPN_AUTH_GROUP:-$DEFAULT_VPN_AUTH_GROUP}
+# check dei file con msg di errore
 
-VPN_OS=${VPN_OS:-$DEFAULT_VPN_OS}
+openvpn --config /etc/openvpn/client.ovpn --auth-user-pass /etc/openvpn/auth.txt
 
-VPN_USER_AGENT=${VPN_USER_AGENT:-$DEFAULT_VPN_USER_AGENT}
-
-echo "$VPN_PW" | openconnect \
-  -v \
-  --authgroup $VPN_AUTH_GROUP \
-  -u "$VPN_USER" \
-  --passwd-on-stdin \
-  --servercert "$VPN_SERVER_CERT" \
-  --os="$VPN_OS" \
-  --background \
-  --useragent="$VPN_USER_AGENT" \
-  "$VPN_SERVER"
-
-log "openconnect kicked off, waiting $WAIT_TIME_SECONDS seconds..."
+log "openvpn kicked off, waiting $WAIT_TIME_SECONDS seconds..."
 sleep $WAIT_TIME_SECONDS
 
 log "...done waiting, starting squid"
